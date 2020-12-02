@@ -3,12 +3,14 @@
 作业：我们在数据库操作的时候，比如 dao 层中当遇到一个 sql.ErrNoRows 的时候，是否应该 Wrap 这个 error，抛给上层。为什么，应该怎么做请写出代码？
 
 ### 1.dao的上层业务已经属于业务层，不应该 直接返回 sql.ErrNoRows错
-原因：
+原因1：
 dao的上层已经属于业务层了，这次使用数据库，下次 增加 redis缓存。会导致上层业务去判断错误，
 应该返回 Custom Error 或者 自定义 Sentinel Error 更好。
 
-原因：避免在每层（service, domain, repository）每次多次处理 error 会携带大量的重复信息。一般都会在 error 抛出的地方处理 wrap error。
+原因2：避免在每层（service, domain, repository）每次多次处理 error 会携带大量的重复信息。一般都会在 error 抛出的地方处理 wrap error。
 因为每个error只应该被wrap一次，就是在error第一次产生的地方
+
+原因3：错误处理只处理一次，要嘛吞掉错误，要嘛在最上层处理日志。
 
 ### 2.如果在业务场景中所有的空结果都不是错误，直接返回 nil 更好。
 原因：
